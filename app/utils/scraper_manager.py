@@ -31,7 +31,14 @@ class ScraperManager:
                     "d3dmark": 15000,
                     "nanoreview": 95,
                     "kimovil": 9.8
-                }
+                },
+                "price_usd": "1,299",
+                "sources": {
+                    "gsmarena": "https://www.gsmarena.com/samsung_galaxy_s24_ultra-12771.php",
+                    "nanoreview": "https://nanoreview.net/en/phone/samsung-galaxy-s24-ultra",
+                    "kimovil": "https://www.kimovil.com/en/where-to-buy-samsung-galaxy-s24-ultra"
+                },
+                "thumbnail_url": "https://fdn2.gsmarena.com/videolib/cp-models/samsung-galaxy-s24-ultra.jpg"
             }
             
             # Normalize and calculate aggregate

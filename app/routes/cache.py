@@ -26,7 +26,7 @@ def get_cache_status():
         "status": "success",
         "data": {
             "device_count": metadata.device_count,
-            "last_update": metadata.last_update.isoformat(),
+            "last_updated": metadata.last_update.isoformat(),
             "expires_at": expires_at.isoformat(),
             "is_expired": is_expired
         }

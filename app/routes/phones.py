@@ -30,9 +30,14 @@ def get_ranking():
         # Contoh rumus value: score / price
         data_list.sort(key=lambda x: x.get('aggregate_score', 0) / max(x.get('price', 1), 1), reverse=True)
 
+    # Ambil metadata untuk last_updated
+    metadata = CacheMetadata.query.first()
+    last_updated = metadata.last_update.isoformat() if metadata else "N/A"
+
     return jsonify({
         "status": "success",
         "data": data_list[:limit],
+        "last_updated": last_updated,
         "message": f"Ranking list fetched successfully ({len(data_list)} devices found)"
     })
 
