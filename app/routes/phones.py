@@ -10,12 +10,30 @@ def get_ranking():
     limit = min(int(request.args.get('limit', 10)), 50)
     sort_by = request.args.get('sort_by', 'score')
     
-    # Logic to fetch from DeviceCache and sort
-    # For now, return empty or mock
+    # Ambil semua device dari cache
+    devices = DeviceCache.query.all()
+    
+    data_list = []
+    for d in devices:
+        device_data = d.data
+        # Tambahkan filter tahun jika diperlukan (asumsi data memiliki field 'year')
+        if year and str(device_data.get('year')) != str(year) and device_data.get('year') is not None:
+             continue
+        data_list.append(device_data)
+
+    # Sorting
+    if sort_by == 'score':
+        data_list.sort(key=lambda x: x.get('aggregate_score', 0), reverse=True)
+    elif sort_by == 'price':
+        data_list.sort(key=lambda x: x.get('price', 0))
+    elif sort_by == 'value':
+        # Contoh rumus value: score / price
+        data_list.sort(key=lambda x: x.get('aggregate_score', 0) / max(x.get('price', 1), 1), reverse=True)
+
     return jsonify({
         "status": "success",
-        "data": [],
-        "message": "Ranking list fetched successfully"
+        "data": data_list[:limit],
+        "message": f"Ranking list fetched successfully ({len(data_list)} devices found)"
     })
 
 @phones_bp.route('/device', methods=['GET'])
