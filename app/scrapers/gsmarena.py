@@ -7,6 +7,26 @@ class GSMArenaScraper(BaseScraper):
         super().__init__()
         self.base_url = "https://www.gsmarena.com"
 
+    def get_latest_flagships(self, limit=10):
+        """Mendapatkan daftar nama smartphone flagship terbaru (harga > $600)."""
+        search_url = f"{self.base_url}/results.php3?sPriceMin=600&sAvailabilities=1"
+        try:
+            soup = self.fetch_page(search_url)
+            makers_div = soup.find('div', class_='makers')
+            if not makers_div:
+                return []
+            
+            devices = []
+            for a in makers_div.find_all('a'):
+                name = a.find('span').text.strip()
+                devices.append(name)
+                if len(devices) >= limit:
+                    break
+            return devices
+        except Exception as e:
+            print(f"Error fetching latest flagships: {e}")
+            return []
+
     def search_device(self, device_name):
         """Mencari perangkat di GSMArena dan mengembalikan URL halaman spesifikasinya."""
         query = urllib.parse.quote(device_name)
