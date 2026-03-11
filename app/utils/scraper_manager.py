@@ -15,46 +15,40 @@ class ScraperManager:
             # Add others here
         }
 
-    def run_refresh(self):
+    def run_refresh(self, target_device="Samsung Galaxy S24 Ultra"):
         with self.app.app_context():
-            print(f"[{datetime.now()}] Starting cache refresh...")
+            print(f"[{datetime.now()}] Starting cache refresh for {target_device}...")
             
-            # This is where the actual multi-source scraping logic would happen
-            # For demonstration, we'll create a mock device if none exists
-            mock_data = {
-                "name": "Samsung Galaxy S24 Ultra",
-                "brand": "Samsung",
-                "scores": {
-                    "antutu": 1900000,
-                    "geekbench": 7000,
-                    "dxomark": 144,
-                    "d3dmark": 15000,
-                    "nanoreview": 95,
-                    "kimovil": 9.8
-                },
-                "price_usd": "1,299",
-                "sources": {
-                    "gsmarena": "https://www.gsmarena.com/samsung_galaxy_s24_ultra-12771.php",
-                    "nanoreview": "https://nanoreview.net/en/phone/samsung-galaxy-s24-ultra",
-                    "kimovil": "https://www.kimovil.com/en/where-to-buy-samsung-galaxy-s24-ultra"
-                },
-                "thumbnail_url": "https://fdn2.gsmarena.com/videolib/cp-models/samsung-galaxy-s24-ultra.jpg"
+            # Gunakan GSMArenaScraper untuk mendapatkan data riil
+            real_data = self.scrapers["gsmarena"].scrape_device(target_device)
+            
+            if not real_data:
+                print(f"Failed to fetch real data for {target_device}")
+                return
+
+            # Hitung skor agregat berdasarkan data yang ditemukan
+            # Untuk demo, kita gunakan skor dasar dari GSMArena dan mock sisanya jika tidak ada
+            antutu_raw = real_data["scores"].get("antutu", 1800000)
+            geek_raw = real_data["scores"].get("geekbench", 7000)
+            
+            # Normalisasi sederhana untuk demo (asumsi max Antutu 2.5jt, Geekbench 10rb)
+            scores_for_agg = {
+                "antutu": (antutu_raw / 2500000) * 100,
+                "geekbench": (geek_raw / 10000) * 100,
+                "dxomark": 85, # Mock sisanya sementara
+                "d3dmark": 88,
+                "nanoreview": 92,
+                "kimovil": 9.4
             }
             
-            # Normalize and calculate aggregate
-            # (In reality, each scraper would provide normalized scores)
-            agg_score = calculate_aggregate_score({
-                "antutu": 95, "geekbench": 90, "dxomark": 85, 
-                "d3dmark": 88, "nanoreview": 92, "kimovil": 94
-            })
-            mock_data["aggregate_score"] = agg_score
+            real_data["aggregate_score"] = calculate_aggregate_score(scores_for_agg)
             
-            device = DeviceCache.query.filter_by(name=mock_data["name"]).first()
+            device = DeviceCache.query.filter_by(name=real_data["name"]).first()
             if not device:
-                device = DeviceCache(name=mock_data["name"])
+                device = DeviceCache(name=real_data["name"])
                 db.session.add(device)
             
-            device.data = mock_data
+            device.data = real_data
             device.updated_at = datetime.utcnow()
             
             # Update metadata
