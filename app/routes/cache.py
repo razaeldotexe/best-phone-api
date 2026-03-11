@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify
-from app.auth import require_api_key
 from app.database import CacheMetadata, db
 from datetime import datetime, timedelta
 from config import Config
@@ -7,7 +6,6 @@ from config import Config
 cache_bp = Blueprint('cache', __name__, url_prefix='/api/v1/cache')
 
 @cache_bp.route('/status', methods=['GET'])
-@require_api_key
 def get_cache_status():
     metadata = CacheMetadata.query.first()
     if not metadata:
@@ -35,7 +33,6 @@ def get_cache_status():
     })
 
 @cache_bp.route('/refresh', methods=['POST'])
-@require_api_key
 def refresh_cache():
     from flask import current_app
     import threading

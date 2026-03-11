@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve Best Phone API
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/best-phone-api
+Environment="PATH=/var/www/best-phone-api/venv/bin"
+ExecStart=/var/www/best-phone-api/venv/bin/gunicorn --config gunicorn_config.py "run:create_app()"
+
+[Install]
+WantedBy=multi-user.target

@@ -1,12 +1,10 @@
 from flask import Blueprint, request, jsonify
-from app.auth import require_api_key
 from app.database import DeviceCache, CacheMetadata
 from datetime import datetime
 
 phones_bp = Blueprint('phones', __name__, url_prefix='/api/v1/phones')
 
 @phones_bp.route('/ranking', methods=['GET'])
-@require_api_key
 def get_ranking():
     year = request.args.get('year', datetime.now().year)
     limit = min(int(request.args.get('limit', 10)), 50)
@@ -21,7 +19,6 @@ def get_ranking():
     })
 
 @phones_bp.route('/device', methods=['GET'])
-@require_api_key
 def get_device():
     name = request.args.get('name')
     if not name:
